@@ -1,20 +1,19 @@
-typedef struct element{
+struct element{
 	char value;
-	struct circular_buffer* next;
-	struct circular_buffer* prev;
-}element;
+	struct element* next;
+	struct element* prev;
+};
 
-typedef struct circular_buffer{
-	int n;
-	struct circular_buffer* head;
-	struct circular_buffer* tail;
+struct circular_buffer{
+	int capacity;
+	struct element* head;
+	struct element* tail;
+};
 
-}circular_buffer;
-
-void init_buffer(circular_buffer *buffer, int n);
-void delete_buffer(circular_buffer *buffer);
-void add_element(circular_buffer *buffer, char value);
-void delete_element(circular_buffer *buffer, element element)
-void print_all(circular_buffer *buffer);
-int is_empty(circular_buffer *buffer);
-int is_full(circular_buffer *buffer);
+struct circular_buffer *init_buffer(int n);
+void delete_buffer(struct circular_buffer *buffer);
+void add_element(struct circular_buffer *buffer, char value);
+void delete_element(struct circular_buffer *buffer, struct element *element);
+void print_all(struct circular_buffer *buffer);
+int is_empty(struct circular_buffer *buffer);
+int is_full(struct circular_buffer *buffer);

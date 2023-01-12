@@ -1,33 +1,28 @@
 #include <stdio.h>
-#include <module.h>
+#include <stdlib.h>
+#include "module.h"
 
-typedef struct element{
-	char value;
-	struct circular_buffer* next;
-	struct circular_buffer* prev;
-}element;
+int last_action = 0;
 
-typedef struct circular_buffer{
-	int n;
-	struct element* head = NULL;
-	struct element* tail = NULL;
-}circular_buffer;
+struct circular_buffer *init_buffer(int n){
+	struct circular_buffer *buffer = (struct circular_buffer*)malloc(n*sizeof(struct circular_buffer));
+	buffer->head = NULL;
+	buffer->tail = NULL;
+	buffer->capacity = 0;
 
-
-void init_buffer(circular_buffer *buffer, int n){
-	buffer = (struct circular_buffer)malloc(n*sizeof(circular_buffer));
 	if(buffer==NULL){
 		printf("Neuspjesna inicijalizacija!");
 	}
+	return buffer;
 }
 
 
-void delete_buffer(circular_buffer *buffer){
+void delete_buffer(struct circular_buffer *buffer){
 	free(buffer);
 }
 
 
-void add_element(circular_buffer *buffer, char value){
+void add_element(struct circular_buffer *buffer, char value){
 
 	if(buffer->head = NULL){
 		struct element* prvi = (struct element*)malloc(sizeof(struct element*));
@@ -36,6 +31,11 @@ void add_element(circular_buffer *buffer, char value){
 		buffer->head->next = prvi;
 		buffer->head->prev = prvi;
 	}
+	else if (is_full(buffer) == 1){
+		printf("Buffer je pun!");
+		return;
+	}
+
 	struct element* temp = (struct element*)malloc(sizeof(struct element*));
 
 	struct element* zadnji = buffer->head->prev;
@@ -45,31 +45,51 @@ void add_element(circular_buffer *buffer, char value){
 	buffer->head->prev = temp;
 	temp->prev = zadnji;
 	zadnji->next = temp;
-	buffer->tail = temp;
+	buffer->tail->next = temp;
 
+	last_action = 1;
+	buffer->capacity++;
 }
 
-void delete_element(circular_buffer *buffer, element *element){
-	struct element* temp;
-	struct element* aux;
-	if(buffer == NULL){
+void delete_element(struct circular_buffer *buffer, struct element *element){
+
+	if(is_empty(buffer) == 1){
 		printf("Buffer je prazan!");
+		return;
 	}
-	temp->next = element->next;
-	temp->prev = element->prev;
 
+	struct element* zadnji = buffer->head->prev;
+	zadnji->prev->next = buffer->head->next;
+	buffer->head->prev = zadnji->prev;
+	free(zadnji);
+	zadnji = NULL;
+
+	last_action = 0;
+	buffer->capacity--;
 }
 
-void print_all(circular_buffer *buffer){
+void print_all(struct circular_buffer *buffer){
 
+	struct element* temp = buffer->head;
+
+	while (buffer->head != buffer->tail){
+		printf("%c", temp->value);
+		temp = temp->next;
+	}
 }
 
-int is_empty(circular_buffer *buffer){
-
+int is_empty(struct circular_buffer *buffer){
+	if((buffer->head == buffer->tail) && last_action == 0){
+		return 1;
+	}
+	return 0;
 }
 
-int is_full(circular_buffer *buffer){
-
+int is_full(struct circular_buffer *buffer){
+	if ((buffer->head == buffer->tail) && last_action == 1){
+		return 1;
+	}
+	return 0;
 }
 
 
